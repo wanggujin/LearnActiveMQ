@@ -12,5 +12,6 @@ include_directories(
 link_directories(
 	/opt/activemqcpp/lib
 )
-
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 add_subdirectory(demo1)
+add_subdirectory(demo2)

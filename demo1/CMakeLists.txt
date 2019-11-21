@@ -1,4 +1,4 @@
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+#set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 add_executable(sender sender.cpp)
 add_executable(receiver receiver.cpp)
 target_link_libraries(sender activemq-cpp)

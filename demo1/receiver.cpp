@@ -1,5 +1,4 @@
 #include <iostream>
-#include <memory>
 #include "activemq/core/ActiveMQConnectionFactory.h"
 #include "activemq/library/ActiveMQCPP.h"
 
@@ -27,6 +26,7 @@ int main()
 		consumer = session->createConsumer(queue);
 		while(true){
 			cms::Message* msg{consumer->receive()};
+//			cms::Message* msg{consumer->receiveNoWait()};
 			cms::TextMessage* text_msg{dynamic_cast<cms::TextMessage*>(msg)};
 			if(text_msg != nullptr){
 				std::cout << "receiver: " << text_msg->getText() << std::endl;

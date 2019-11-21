@@ -1,7 +1,7 @@
 #include <iostream>
-#include <memory>
 #include "activemq/core/ActiveMQConnectionFactory.h"
 #include "activemq/library/ActiveMQCPP.h"
+#include "cms/ConnectionFactory.h"
 
 int main()
 {
