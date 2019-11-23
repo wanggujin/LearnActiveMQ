@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(activemq_demo)
+project(LearnActiveMQ)
 
 add_definitions(-std=c++11)
 add_definitions("-Wall -g")
@@ -13,5 +13,6 @@ link_directories(
 	/opt/activemqcpp/lib
 )
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-add_subdirectory(demo1)
-add_subdirectory(demo2)
+add_subdirectory(lesson1)
+add_subdirectory(lesson2)
+add_subdirectory(lesson3)
