@@ -1,41 +1,50 @@
 #include <iostream>
 #include "activemq/core/ActiveMQConnectionFactory.h"
 #include "activemq/library/ActiveMQCPP.h"
-#include "cms/ConnectionFactory.h"
 
 int main()
 {
 	activemq::library::ActiveMQCPP::initializeLibrary();
+	
 	cms::Connection* connection{nullptr};
 	cms::Session* session{nullptr};
 	cms::Topic* topic{nullptr};
-	cms::MessageProducer* producer{nullptr};
-	int num_messages{5};
+	cms::MessageConsumer* consumer{nullptr};
 	std::string broker_url{"tcp://127.0.0.1:61616"};
 	std::string topic_name{"test_topic"};
 	
 	try{
-		activemq::core::ActiveMQConnectionFactory acf{broker_url};
+		activemq::core::ActiveMQConnectionFactory acf{broker_url}; 
 		connection = acf.createConnection();
+		connection->setClientID("durable_client");
 		connection->start();
 		
 		session = connection->createSession(cms::Session::AUTO_ACKNOWLEDGE);
 		topic = session->createTopic(topic_name);
-		producer = session->createProducer(topic);
-		producer->setDeliveryMode(cms::DeliveryMode::PERSISTENT);
-		for(int i{0}; i < num_messages; ++i){
-			std::unique_ptr<cms::TextMessage> msg{session->createTextMessage("message-" + std::to_string(i))};
-			producer->send(msg.get());
+		consumer = session->createDurableConsumer(topic, "test_durable", "");
+		
+		while(true){
+			cms::Message* message{consumer->receive()};
+			if(message != nullptr){
+				cms::TextMessage* msg{dynamic_cast<cms::TextMessage*>(message)};
+				if(msg != nullptr){
+					std::cout << "receiver: " << msg->getText() << std::endl;
+				}else{
+					std::cout << "not a text message" << std::endl;
+				}
+			}else{
+				break;
+			}
+			delete message;
 		}
-		std::cout << "send done" << std::endl;
 		
 		if(topic != nullptr){
 			delete topic;
 			topic = nullptr;
 		}
-		if(producer != nullptr){
-			delete producer;
-			producer = nullptr;
+		if(consumer != nullptr){
+			delete consumer;
+			consumer = nullptr;
 		}
 		if(session != nullptr){
 			session->close();

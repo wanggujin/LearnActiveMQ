@@ -20,8 +20,8 @@ int main()
 		
 		session = connection->createSession(cms::Session::AUTO_ACKNOWLEDGE);
 		topic = session->createTopic(topic_name);
-//		consumer = session->createDurableConsumer(topic, "hongjing", "");
 		consumer = session->createConsumer(topic);
+		
 		while(true){
 			cms::Message* message{consumer->receive()};
 			if(message != nullptr){
