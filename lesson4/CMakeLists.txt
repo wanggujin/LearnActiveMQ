@@ -1,0 +1,8 @@
+add_executable(sender_client_ack sender.cpp)
+target_link_libraries(sender_client_ack activemq-cpp)
+
+add_executable(receiver_client_ack receiver.cpp)
+target_link_libraries(receiver_client_ack activemq-cpp)
+
+add_executable(receiver_client_once_ack receiver_once_ack.cpp)
+target_link_libraries(receiver_client_once_ack activemq-cpp)

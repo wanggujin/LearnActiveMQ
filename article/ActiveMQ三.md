@@ -79,13 +79,13 @@ while(true){
 
 ![image](image/14.png)
 
-总于，我们看到接收端成功收到了发布者在该主题上发布的消息。
+终于，我们看到接收端成功收到了发布者在该主题上发布的消息。
 
 # 持久订阅
 
 还有一个问题是，如果订阅者在订阅后接收到一些消息，然后宕机了。那么，当该订阅者重启后，是否能收到其宕机期间发布者发布的消息呢。我们来试试。
 
-根据上图，现在我们的订阅者`topic_receiver`还在连接着ActiveMQ，如果此时再次运行一下`topic_sender`，其发布的消息, `topic_receiver`仍然可以收到，大家可以自行测试。问题是，如果我们先关闭`topic_receiver`，然后运行一次`topic_sender`，先该主题发布几条消息，再启动我们的`topic_receiver`，看是否能接收到我们刚才发布的消息。运行结果如下：
+根据上图，现在我们的订阅者`topic_receiver`还在连接着ActiveMQ，如果此时再次运行一下`topic_sender`，其发布的消息, `topic_receiver`仍然可以收到，大家可以自行测试。问题是，如果我们先关闭`topic_receiver`，然后运行一次`topic_sender`，向该主题发布几条消息，再启动我们的`topic_receiver`，看是否能接收到我们刚才发布的消息。运行结果如下：
 
 ![image](image/12.png)
 
@@ -100,7 +100,7 @@ while(true){
 - 调用`createDurableConsumer()`来创建订阅者，其声明如下：
 
 ```cpp
-virtual MessageConsumer* createDurableConsumer(const Topic* destination, const std::string& name, const std::string& selector, bool noLocal = false) = 0;
+MessageConsumer* createDurableConsumer(const Topic* destination, const std::string& name, const std::string& selector, bool noLocal = false);
 ```
 
 - `destination`，即为我们要订阅的Topic。
@@ -116,7 +116,7 @@ virtual MessageConsumer* createDurableConsumer(const Topic* destination, const s
 
 ![image](image/15.png)
 
-可见，我们仍然是成功向主题发布了5条消息。并且，上图和之前不一样的是，由于我们发布之前运行过订阅者，对该主题进行了持久订阅，虽然，此时，我们的`topic_receiver`并不在线，但队列的消费者个数依然显示为1，也即证明了ActiveMQ为我们保存了刚才那个持久订阅者。然后，我们再次启动我们的`topic_receiver`，我们就能收到刚才发布的5条消息，而这5条消息，是订阅者不在线的时候，由发布者发布出来的。也即证明了我们上面所述之理论。`topic_receiver`运行如下：
+可见，我们仍然是成功向主题发布了5条消息。并且，上图和之前不一样的是，由于我们发布之前运行过订阅者，对该主题进行了持久订阅，虽然，此时我们的`topic_receiver`并不在线，但队列的消费者个数依然显示为1，也即证明了ActiveMQ为我们保存了刚才那个持久订阅者。然后，我们再次启动我们的`topic_receiver`，我们就能收到刚才发布的5条消息，而这5条消息，是订阅者不在线的时候，由发布者发布出来的。也即证明了我们上面所述之理论。`topic_receiver`运行如下：
 
 ![image](image/16.png)
 
@@ -126,4 +126,8 @@ virtual MessageConsumer* createDurableConsumer(const Topic* destination, const s
 
 从上图我们也可以看到，ActiveMQ对订阅者的分类：活动的持久订阅者、离线的持久订阅者、活动的非持久订阅者。当前在`离线的持久订阅者`表格中，即显示了我们刚才创建的持久化订阅者。
 
-本文详细代码见[lesson3](https://github.com/wanggujin/LearnActiveMQ/tree/master/lesson3)
+# 补充
+
+- 如果想手动取消订阅的主题，可以调用`session->unsubscribe("topic_name")`即可
+
+- 本文详细代码见[lesson3](https://github.com/wanggujin/LearnActiveMQ/tree/master/lesson3)
