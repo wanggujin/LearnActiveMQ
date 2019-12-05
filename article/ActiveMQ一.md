@@ -33,7 +33,7 @@ ActiveMQ是Apache下一款成熟的、高性能的消息中间件，其支持多
 - Topic: 主题。
 - Message: 消息。
 - transportConnector: 消息传输连接器，用于向Broker发送消息或从Broker消费消息。
-- networkConnector: 网络连接器，主要用于搭建master-slave。
+- networkConnector: 网络连接器，用于连接不同的Broker。
 - Producer: 消息生产者，负责向消息队列中生产消息。
 - Consumer: 消息消费者，负责从消息队列中消费消息。
 
@@ -57,6 +57,7 @@ ActiveMQ是Apache下一款成熟的、高性能的消息中间件，其支持多
 ```shell
 ./activemq start #后台启动
 ./activemq console #前台启动
+./activemq stop #停止
 ```
 
 笔者以前台启动，可在控制台看到启动信息如下：
@@ -295,7 +296,7 @@ cf = nullptr;
 
 除此之外，我们还可以调用另一个函数`receiveNoWait()`，该函数在没有消息到来时并不等待，而是立即返回`nullptr`。
 
-3. 最后要注意的是，无论生产者还是消费者，都有手动释放创建的消息或接收到的消息，以免内存泄露。
+3. 最后要注意的是，无论生产者还是消费者，都要手动释放创建的消息或接收到的消息，以免内存泄露。
 
 4. 其实，不论调用哪个上述哪个函数，本质上都是消费者主动接收或者轮训ActiveMQ，目前有没有消息可用。为了解决这个问题，我们可用使用另外两种方法：
 	- 将消费者逻辑放到单独的线程中去做。

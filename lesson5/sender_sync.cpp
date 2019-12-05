@@ -1,6 +1,21 @@
 #include <iostream>
+#include <chrono>
 #include "activemq/core/ActiveMQConnectionFactory.h"
 #include "activemq/library/ActiveMQCPP.h"
+#include "cms/ConnectionFactory.h"
+
+class MyAsyncCallback : public cms::AsyncCallback{
+public:
+	void onSuccess(){
+//		std::cout << "message send success" << std::endl;
+		delete this;
+	}
+	
+	void onException(const cms::CMSException& ex){
+		std::cout << "message send failed: " << ex.what() << std::endl;
+		delete this;
+	}
+};
 
 int main()
 {
@@ -9,7 +24,7 @@ int main()
 	cms::Session* session{nullptr};
 	cms::Queue* queue{nullptr};
 	cms::MessageProducer* producer{nullptr};
-	int num_messages{5};
+	int num_messages{50000};
 	std::string broker_url{"tcp://127.0.0.1:61616"};
 	std::string queue_name{"test_queue"};
 	
@@ -21,10 +36,16 @@ int main()
 		session = connection->createSession(cms::Session::AUTO_ACKNOWLEDGE);
 		queue = session->createQueue(queue_name);
 		producer = session->createProducer(queue);
+		
+		auto start{std::chrono::system_clock::now()};
 		for(int i{0}; i < num_messages; ++i){
-			std::unique_ptr<cms::TextMessage> msg{session->createTextMessage("message-" + std::to_string(i))};
-			producer->send(msg.get());
+			cms::TextMessage* msg{session->createTextMessage("message-" + std::to_string(i))};
+			producer->send(msg);
 		}
+		auto end{std::chrono::system_clock::now()};
+		std::cout << "time span: " << 
+								 std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << 
+								 "ms" << std::endl;
 		std::cout << "send done" << std::endl;
 		
 		if(queue != nullptr){

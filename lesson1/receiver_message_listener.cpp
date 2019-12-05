@@ -2,14 +2,13 @@
 #include "activemq/core/ActiveMQConnectionFactory.h"
 #include "activemq/library/ActiveMQCPP.h"
 
-class MyMessageAvailableListener : public cms::MessageAvailableListener{
+class MyMessageListener : public cms::MessageListener{
 public:
-	void onMessageAvailable(cms::MessageConsumer* consumer){
-		cms::Message* message{consumer->receive()};
+	void onMessage(const cms::Message* message){
 		if(message != nullptr){
 			cms::TextMessage const* msg{dynamic_cast<const cms::TextMessage*>(message)};
 			if(msg != nullptr){
-				std::cout << "receiver will not block: " << msg->getText() << std::endl;
+				std::cout << "callback receiver: " << msg->getText() << std::endl;
 			}else{
 				std::cout << "not text message" << std::endl;
 			}
@@ -31,22 +30,19 @@ int main()
 	std::string queue_name{"test_queue"};
 	
 	try{
-		cms::ConnectionFactory* cf{cms::ConnectionFactory::createCMSConnectionFactory(broker_url)};
+		std::unique_ptr<cms::ConnectionFactory> cf{cms::ConnectionFactory::createCMSConnectionFactory(broker_url)};
 		connection = cf->createConnection();
-		delete cf;
-		cf = nullptr;
+		cf.reset();
 		
 		connection->start();
 		session = connection->createSession(cms::Session::AUTO_ACKNOWLEDGE);
 		queue = session->createQueue(queue_name);
 		consumer = session->createConsumer(queue);
 		
-		MyMessageAvailableListener* message_listener{new MyMessageAvailableListener};
-		consumer->setMessageAvailableListener(message_listener);
+		MyMessageListener message_listener;
+		consumer->setMessageListener(&message_listener);
 		
 		decaf::lang::Thread::sleep(1000 * 10);
-		delete message_listener;
-		message_listener = nullptr;
 		
 		if(queue != nullptr){
 			delete queue;

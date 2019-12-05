@@ -15,25 +15,29 @@ int main()
 	
 	try{
 		activemq::core::ActiveMQConnectionFactory acf{broker_url}; //1
-//		cms::ConnectionFactory* cf{cms::ConnectionFactory::createCMSConnectionFactory(broker_url)};//2
-//		connection = cf->createConnection();
-//		delete cf;
-//		cf = nullptr;
+//        std::unique_ptr<cms::ConnectionFactory> cf{cms::ConnectionFactory::createCMSConnectionFactory(broker_url)};
+//        connection = cf->createConnection();
+//        cf.reset();
 		connection = acf.createConnection();
 		connection->start();
 		session = connection->createSession(cms::Session::AUTO_ACKNOWLEDGE);
 		queue = session->createQueue(queue_name);
 		consumer = session->createConsumer(queue);
 		while(true){
-			cms::Message* msg{consumer->receive()};
-//			cms::Message* msg{consumer->receiveNoWait()};
-			cms::TextMessage* text_msg{dynamic_cast<cms::TextMessage*>(msg)};
-			if(text_msg != nullptr){
-				std::cout << "receiver: " << text_msg->getText() << std::endl;
-			}else{
-				std::cout << "not a text message" << std::endl;
-			}
-			delete msg;
+			cms::Message* message{consumer->receive()};
+			//cms::Message* message{consumer->receiveNoWait()};
+            //cms::Message* message{consumer->receive(3000)};
+            if(message != nullptr){
+                cms::TextMessage* msg{dynamic_cast<cms::TextMessage*>(msg)};
+                if(msg != nullptr){
+                    std::cout << "receiver: " << msg->getText() << std::endl;
+                }else{
+                    std::cout << "not a text message" << std::endl;
+                }
+                delete message;
+            }else{
+                break;
+            }
 		}
 		
 		if(queue != nullptr){

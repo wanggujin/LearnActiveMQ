@@ -1,9 +1,13 @@
 #include <iostream>
 #include <thread>
 #include "activemq/core/ActiveMQConnectionFactory.h"
+#include "activemq/core/policies/DefaultPrefetchPolicy.h"
 #include "activemq/library/ActiveMQCPP.h"
 
-void ConsumerThread(){
+int main()
+{
+	activemq::library::ActiveMQCPP::initializeLibrary();
+	
 	cms::Connection* connection{nullptr};
 	cms::Session* session{nullptr};
 	cms::Queue* queue{nullptr};
@@ -12,44 +16,56 @@ void ConsumerThread(){
 	std::string queue_name{"test_queue"};
 	
 	try{
-		cms::ConnectionFactory* cf{cms::ConnectionFactory::createCMSConnectionFactory(broker_url)};
-		connection = cf->createConnection();
-		delete cf;
-		cf = nullptr;
-		
+		activemq::core::ActiveMQConnectionFactory acf{broker_url};
+		activemq::core::policies::DefaultPrefetchPolicy dpp;
+		dpp.setQueuePrefetch(1);
+		acf.setPrefetchPolicy(&dpp);
+		acf.setDispatchAsync(false);
+		connection = acf.createConnection();		
 		connection->start();
 		session = connection->createSession(cms::Session::AUTO_ACKNOWLEDGE);
 		queue = session->createQueue(queue_name);
 		consumer = session->createConsumer(queue);
 		
 		while(true){
-			cms::Message* message{consumer->receive(5000)};
+			cms::Message* message{consumer->receive()};
 			if(message != nullptr){
 				cms::TextMessage* msg{dynamic_cast<cms::TextMessage*>(message)};
 				if(msg != nullptr){
 					std::cout << "receiver: " << msg->getText() << std::endl;
 				}else{
-					std::cout << "not text message" << std::endl;
+					std::cout << "not a text message" << std::endl;
 				}
+				delete msg;
+				std::this_thread::sleep_for(std::chrono::seconds(1));
 			}else{
 				break;
 			}
 		}
+		
+		if(queue != nullptr){
+			delete queue;
+			queue = nullptr;
+		}
+		if(consumer != nullptr){
+			delete consumer;
+			consumer = nullptr;
+		}
+		if(session != nullptr){
+			session->close();
+			delete session;
+			session = nullptr;
+		}
+		if(connection != nullptr){
+			connection->close();
+			delete connection;
+			connection = nullptr;
+		}
 	}catch(cms::CMSException& e){
 		e.printStackTrace();
 	}
-}
-
-int main()
-{
-	activemq::library::ActiveMQCPP::initializeLibrary();
-	
-	std::thread t{ConsumerThread};
-	
-	//处理其他逻辑
-	
-	t.join();
 	
 	activemq::library::ActiveMQCPP::shutdownLibrary();
+	
 	return 0;
 }
