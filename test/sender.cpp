@@ -11,7 +11,7 @@ int main()
 	cms::Topic* topic{nullptr};
 	cms::MessageProducer* producer{nullptr};
 	int num_messages{5};
-	std::string broker_url{"tcp://127.0.0.1:61616"};
+	std::string broker_url{"vm://localhost"};
 	std::string topic_name{"test_topic"};
 	
 	try{

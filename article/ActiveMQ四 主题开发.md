@@ -147,4 +147,4 @@ activemq::library::ActiveMQCPP::shutdownLibrary();
 
 对于`Topic`的消费者，同样可以使用上篇文章提到的另外几种消费方式。大家可以自行测试。
 
-本文的详细代码见[lesson2](www.baidu.com)
+本文的详细代码见[lesson2](https://github.com/wanggujin/LearnActiveMQ/tree/master/lesson2)
