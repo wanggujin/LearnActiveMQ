@@ -1,4 +1,0 @@
-/home/wanggujin/demo/LearnActiveMQ/test/build/CMakeFiles/edit_cache.dir
-/home/wanggujin/demo/LearnActiveMQ/test/build/CMakeFiles/rebuild_cache.dir
-/home/wanggujin/demo/LearnActiveMQ/test/build/CMakeFiles/receiver.dir
-/home/wanggujin/demo/LearnActiveMQ/test/build/CMakeFiles/sender.dir
