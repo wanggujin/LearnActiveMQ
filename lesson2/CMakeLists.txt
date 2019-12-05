@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(Lesson1)
+project(Lesson2)
 
 add_definitions(-std=c++11)
 add_definitions("-Wall -g")
@@ -18,9 +18,3 @@ target_link_libraries(sender activemq-cpp)
 
 add_executable(receiver receiver.cpp)
 target_link_libraries(receiver activemq-cpp)
-
-add_executable(receiver_listener receiver_message_listener.cpp)
-target_link_libraries(receiver_listener activemq-cpp)
-
-add_executable(receiver_available_listener receiver_message_available.cpp)
-target_link_libraries(receiver_available_listener activemq-cpp)
